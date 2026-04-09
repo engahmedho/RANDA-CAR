@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: car-price-predictor-api
+    env: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build && python -m pip install --upgrade pip setuptools wheel && pip install -r server/requirements.txt
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: PYTHON_VERSION
+        value: 3.11.11
+    routes:
+      - path: /
+        destination: /
+      - path: /api/*
+        destination: /api/*
+
+  - type: static_site
+    name: car-price-predictor-web
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    publishPath: dist/public
+    routes:
+      - path: /
+        destination: /index.html
+      - path: /*.html
+        destination: /$1.html
+      - path: /api/*
+        destination: https://car-price-predictor-api.onrender.com/api/$1
